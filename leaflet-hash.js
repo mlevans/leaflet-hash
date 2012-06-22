@@ -1,4 +1,4 @@
-(function(window,$) {
+(function(window) {
     var HAS_HASHCHANGE = (function() {
         var doc_mode = window.documentMode;
         return ('onhashchange' in window) &&
@@ -141,4 +141,4 @@
             this.isListening = false;
         }
     };
-})(window,jQuery);
+})(window);
