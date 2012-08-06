@@ -18,6 +18,9 @@
         lastHash: null,
     
         parseHash: function(hash) {
+            if(hash.indexOf('#') == 0) {
+                hash = hash.substr(1);
+            }
             var args = hash.split("/");
             if (args.length == 3) {
                 var zoom = parseInt(args[0], 10),
@@ -90,8 +93,7 @@
                 // console.info("(no change)");
                 return;
             }
-            var sansHash = hash.substr(1),
-                parsed = this.parseHash(sansHash);
+            var parsed = this.parseHash(hash);
             if (parsed) {
                 // console.log("parsed:", parsed.zoom, parsed.center.toString());
                 this.movingMap = true;
