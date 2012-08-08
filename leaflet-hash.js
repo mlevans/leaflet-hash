@@ -53,7 +53,7 @@
         init: function(map) {
             this.map = map;
             
-            this.map.on("move", this.onMapMove, this);
+            this.map.on("moveend", this.onMapMove, this);
             
             // reset the hash
             this.lastHash = null;
