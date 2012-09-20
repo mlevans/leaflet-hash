@@ -1,1 +1,77 @@
-Setting up Github pages
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Leaflet-hash</title>
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:600" rel="stylesheet" type="text/css" >
+        <link href="stylesheets/leaflet.css" rel="stylesheet" type="text/css" >
+        <!--[if lte IE 8]>
+            <link href="stylesheets/leaflet.ie.css" rel="stylesheet" type="text/css" >
+        <![endif]-->
+        <script type="text/javascript" src="javascripts/leaflet.js"></script>
+        <script type="text/javascript" src="javascripts/leaflet-hash.js"></script>
+        <script type="text/javascript">
+            function initMap() {
+                var map = L.map('map', {scrollWheelZoom: false, zoomControl: false, zoom: 12, center: [51.505, -0.09]});
+
+                L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', {attribution: 'Stamen'}).addTo(map);
+
+                var hash = new L.Hash(map);
+            }
+        </script>
+        <style type="text/css">
+
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 14px;
+                /*line-height: 16px;*/
+                padding: 0px;
+                margin: 0;
+            }
+            
+            a {
+                text-decoration: none;
+            }
+
+            h1 {
+                font-family: 'Open Sans', sans-serif;
+                font-size: 36px;
+                margin: 0 0 0px 0;
+            }
+
+            #container {
+                width: 100%;
+                height: 600px;
+            }
+
+            #map {
+                width: 100%;
+                height: 100%;
+            }
+
+            .report {
+                margin-left: -45px;
+                margin-top: -45px;
+                width: 91px;
+                height: 91px;
+            }
+
+            .report img {
+                border: none !important;
+            }
+
+            .report:hover {
+                z-index: 1000;
+            }
+        </style>
+    </head>
+    <body onload="initMap()">
+        <div style='padding: 20px; text-align: center;'>
+        <h1>Leaflet-hash</h1>
+        <p style="padding: 0px; line-height: 0px;"><i>Add dynamic URL hashes to web pages with leaflet maps</i></p>
+        </div>
+        <div id="container">
+            <div id="map">
+            </div>
+        </div>
+    </body>
+</html>
