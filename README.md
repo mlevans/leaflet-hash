@@ -3,6 +3,8 @@
 Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps. You can easily
 link users to specific map views.
 
+[Screenshot top level]
+
 [Screenshot]
 
 ### How to use
