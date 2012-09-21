@@ -2,76 +2,130 @@
 <html>
     <head>
         <title>Leaflet-hash</title>
+        <meta charset="utf-8">
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:600" rel="stylesheet" type="text/css" >
         <link href="stylesheets/leaflet.css" rel="stylesheet" type="text/css" >
         <!--[if lte IE 8]>
             <link href="stylesheets/leaflet.ie.css" rel="stylesheet" type="text/css" >
         <![endif]-->
-        <script type="text/javascript" src="javascripts/leaflet.js"></script>
-        <script type="text/javascript" src="javascripts/leaflet-hash.js"></script>
-        <script type="text/javascript">
-            function initMap() {
-                var map = L.map('map', {scrollWheelZoom: false, zoomControl: false, zoom: 12, center: [51.505, -0.09]});
-
-                L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', {attribution: 'Stamen'}).addTo(map);
-
-                var hash = new L.Hash(map);
-            }
-        </script>
         <style type="text/css">
-
             body {
-                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-                font-size: 14px;
-                /*line-height: 16px;*/
+                font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
                 padding: 0px;
-                margin: 0;
+                margin: 0px;
             }
             
             a {
                 text-decoration: none;
+                color: #050505;
+            }
+
+            a:hover {
+                color: #5e5e5e;
+            }
+
+            #header-container {
+                text-align: center;
+                width: 100%;
+                height: 120px;
+            }
+
+            #header {
+                height: 40px;
+                padding: 16px 0px 0px 0px;
             }
 
             h1 {
                 font-family: 'Open Sans', sans-serif;
                 font-size: 36px;
-                margin: 0 0 0px 0;
+                margin: 0px;
             }
 
-            #container {
-                width: 100%;
-                height: 600px;
+            #description {
+                line-height: 0px;
+                font-style: italic;
             }
 
             #map {
+                top: 120px;
                 width: 100%;
-                height: 100%;
-            }
-
-            .report {
-                margin-left: -45px;
-                margin-top: -45px;
-                width: 91px;
-                height: 91px;
-            }
-
-            .report img {
-                border: none !important;
-            }
-
-            .report:hover {
-                z-index: 1000;
+                position: absolute;
+                background: #fff;
             }
         </style>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="javascripts/leaflet.js"></script>
+        <script type="text/javascript" src="javascripts/leaflet-hash.js"></script>
     </head>
-    <body onload="initMap()">
-        <div style='padding: 20px; text-align: center;'>
-        <h1>Leaflet-hash</h1>
-        <p style="padding: 0px; line-height: 0px;"><i>Add dynamic URL hashes to web pages with leaflet maps</i></p>
-        </div>
-        <div id="container">
-            <div id="map">
+    <body>
+        <div id="header-container">
+            <div id="header">
+                <h1><a href="http://github.com/mlevans/leaflet-hash">Leaflet-hash</a></h1>
+                <p id="description">Drag or zoom the map to change the URL hash</p>
             </div>
         </div>
+        <script type="text/javascript">
+            $(function() {
+                var map;
+
+                initMap();
+
+                function setMapHeight()
+                {   
+                    var map_height = window.innerHeight - document.getElementById("header-container").offsetHeight;
+
+                    document.getElementById("map").style.height = map_height + "px";
+                }
+
+                function zoomByAbout(e) {
+                    // Assumes map is global and initialized
+                    var x = .5*$('#map').width(),
+                        y = .5*$('#map').height(),
+                        mouse_point = e.containerPoint,
+                        new_center_point = new L.Point((x + mouse_point.x) / 2, (y + mouse_point.y) / 2),
+                        new_center_location = map.containerPointToLatLng(new_center_point);
+                               
+                    map.setView(new_center_location, map.getZoom() + 1); 
+                }
+
+                function initMap() {
+                    setMapHeight();
+
+                    // Window Callback; adjust the map on resize
+                    window.onresize = setMapHeight;
+
+                    // Set up the map
+
+                    map = L.map('map', {
+                        scrollWheelZoom: false,
+                        doubleClickZoom: false,
+                        zoomControl: false,
+                        attributionControl: false,
+                        zoom: 12, 
+                        center: [37.7630,-122.4435]
+                    });
+
+                    map.on('dblclick', function(e) { zoomByAbout(e) }); 
+
+                    L.tileLayer('http://{s}.tile.stamen.com/toner-hybrid/{z}/{x}/{y}.png', {attribution: 'Stamen'}).addTo(map);
+
+                    // Set up the hash
+
+                    var hash = new L.Hash(map);
+
+                    // Removing the marker for now
+                    /*
+                    var markerIcon = L.icon({
+                        iconUrl: 'images/marker.png',
+                        iconSize: [91, 91]
+                    })
+                    var marker = L.marker([37.82497195707114, -122.3710441], {icon: markerIcon}).addTo(map);
+
+                    marker.on('dblclick', function(e) { zoomByAbout(e) });
+                    */
+                }
+            });
+        </script>
+        <div id="map"></div>
     </body>
 </html>
