@@ -5,9 +5,6 @@ link users to specific map views.
 
 ![Leaflet-hash](https://github.com/mlevans/leaflet-hash/raw/master/screenshots/screenshot.png)
 
-The hash has the following structure: #[Zoom Level]/[Latitude]/[Longitude]. For example, a hash that
-describes San Francisco at Zoom 12 looks like #12/37.7527/-122.4364.
-
 ### Demo
 You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html](http://mlevans.github.com/leaflet-hash/map.html).
 
