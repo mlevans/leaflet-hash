@@ -1,14 +1,14 @@
-### Leaflet-hash
+# Leaflet-hash
 
 Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps. You can easily
 link users to specific map views.
 
 ![Leaflet-hash](https://github.com/mlevans/leaflet-hash/raw/master/screenshots/screenshot.png)
 
-### Demo
+## Demo
 You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html](mlevans.github.com/leaflet-hash/map.html).
 
-### Usage
+## Usage
 
 1. Prepare a basic leaflet map. You can find instructions on [Leaflet's quick-start guide](http://leaflet.cloudmade.com/examples/quick-start.html).
 
@@ -21,7 +21,7 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
         var hash = new L.Hash(map);
        ```
 
-### Author
+## Author
 @mlevans
 
 ### Contributors
@@ -29,6 +29,6 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
 
 @yohanboniface
 
-### License
+## License
 
 MIT License. See [LICENSE](https://github.com/mlevans/leaflet-hash/blob/master/LICENSE.md) for details.
