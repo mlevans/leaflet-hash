@@ -22,12 +22,12 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
        ```
 
 ### Author
-[@mlevans][mlevans]
+[@mlevans](http://github.com/mlevans)
 
 ### Contributors
-[@rsudekum][rsudekum]
+[@rsudekum](http://github.com/rsudekum)
 
-[@yohanboniface][yohanboniface]
+[@yohanboniface](http://github.com/yohanboniface)
 
 ### License
 
