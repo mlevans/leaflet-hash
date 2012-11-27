@@ -143,4 +143,7 @@
             this.isListening = false;
         }
     };
+    L.hash = function(map){
+        return new L.Hash(map);	
+    };
 })(window);
