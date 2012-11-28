@@ -147,6 +147,9 @@
         return new L.Hash(map);	
     };
     L.Map.prototype.addHash = function(){
-		L.hash(this);
+		this._hash = L.hash(this);
 	};
+	L.Map.prototype.removeHash = function(){
+		this._hash.remove();
+	}
 })(window);
