@@ -29,6 +29,8 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
 
 [@yohanboniface](http://github.com/yohanboniface)
 
+[@calvinmetcalf](http://github.com/calvinmetcalf)
+
 ### License
 
 MIT License. See [LICENSE](https://github.com/mlevans/leaflet-hash/blob/master/LICENSE.md) for details.
