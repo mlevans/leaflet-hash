@@ -14,7 +14,9 @@
     };
     
     L.Hash.prototype.map = null;
+    
     L.Hash.prototype.lastHash = null;
+    
     L.Hash.prototype.parseHash = function(hash) {
         if(hash.indexOf('#') == 0) {
             hash = hash.substr(1);
@@ -36,6 +38,7 @@
             return false;
         }
     };
+    
     L.Hash.prototype.formatHash = function(map) {
         var center = map.getCenter(),
             zoom = map.getZoom(),
@@ -84,6 +87,7 @@
     };
     
     L.Hash.prototype.movingMap = false;
+    
     L.Hash.prototype.update = function() {
         var hash = location.hash;
         if (hash === this.lastHash) {
@@ -106,7 +110,9 @@
     
     // defer hash change updates every 100ms
     L.Hash.prototype.changeDefer = 100;
+    
     L.Hash.prototype.changeTimeout= null;
+    
     L.Hash.prototype.onHashChange = function() {
         // throttle calls to update() so that they only happen every
         // `changeDefer` ms
@@ -120,7 +126,9 @@
     };
 
     L.Hash.prototype.isListening = false;
+    
     L.Hash.prototype.hashChangeInterval = null;
+    
     L.Hash.prototype.startListening = function() {
         if (HAS_HASHCHANGE) {
             L.DomEvent.addListener(window, "hashchange", this.onHashChange);
@@ -143,10 +151,13 @@
     L.hash = function(map){
         return new L.Hash(map);	
     };
+    
     L.Map.prototype.addHash = function(){
 		this._hash = L.hash(this);
 	};
+	
 	L.Map.prototype.removeHash = function(){
 		this._hash.remove();
 	};
+	
 })(window);
