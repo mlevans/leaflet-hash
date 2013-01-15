@@ -18,8 +18,20 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
 
 	```javascript
         // Assuming your map instance is in a variable called map
-        var hash = new L.Hash(map);
+        map.addHash();
     ```
+    
+### Hacking Around
+
+1. Build with cake,
+	
+	```bash
+	npm install #install dependencies
+	cake build #builds it regular
+	cake min #builds minified
+	cake all #does both
+	```
+2. leaflet-hash.coffee is the file to modify.
 
 ### Author
 [@mlevans](http://github.com/mlevans)
