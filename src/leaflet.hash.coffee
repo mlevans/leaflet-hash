@@ -1,7 +1,10 @@
 class Hash
 	constructor: (@map,@options={}) ->
 		unless @options.path
-			@options.path = '{z}/{lat}/{lng}'
+			if @options.lc
+				@options.path = '{z}/{lat}/{lng}/{base}/{overlay}'
+			else
+				@options.path = '{z}/{lat}/{lng}'
 		if history.pushState
 			@withPushState()
 		else
@@ -46,9 +49,12 @@ class Hash
 		zIndex = path.indexOf("{z}")
 		latIndex = path.indexOf("{lat}")
 		lngIndex = path.indexOf("{lng}")
+		if @options.lc
+			baseIndex = path.indexOf("{base}")
+			overlayIndex = path.indexOf("{overlay}")
 		hash = hash.substr(1)  if hash.indexOf("#") is 0
 		args = hash.split("/")
-		if args.length is path.length
+		if args.length > 2
 			zoom = parseInt(args[zIndex], 10)
 			lat = parseFloat(args[latIndex])
 			lon = parseFloat(args[lngIndex])
@@ -57,6 +63,9 @@ class Hash
 			else
 				center: new L.LatLng(lat, lon)
 				zoom: zoom
+			if args > 4
+				@setBase args[baseIndex]
+				@setOverlay args[overlayIndex]
 		else
 			false
     
@@ -64,13 +73,18 @@ class Hash
 		center = @map.getCenter()
 		zoom = @map.getZoom()
 		precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2))
+		state =  {center:center,zoom:zoom}
+		template = {lat:center.lat.toFixed(precision),lng:center.lng.toFixed(precision),z:zoom}
+		if @options.lc
+			layers = @getLayers()
+			state.base=layers[0]
+			template.base=layers[0]
+			state.overlay=layers[1]
+			template.overlay = layers[1].join(",")
 		[
-			{center:center,zoom:zoom}
+			state
 			"a"
-			'#'+L.Util.template @options.path,
-				lat:center.lat.toFixed(precision)
-				lng:center.lng.toFixed(precision)
-				z:zoom
+			'#'+L.Util.template @options.path,template
 		]
 	
 	remove : ()=>
@@ -78,6 +92,37 @@ class Hash
 		if window.onpopstate
 			window.onpopstate = null
 		location.hash=""
+	getLayers : ()=>
+		out=["",[]]
+		for key of @options.lc._layers
+			if @map._layers[key]
+				if @options.lc._layers[key].overlay
+					out[1].push @options.lc._layers[key].name
+				else
+					out[0] = @options.lc._layers[key].name
+		out
+	setBase : (baseLayer)=>
+		baseLayers = @options.lc._container.children[1].children[0].children
+		len = baseLayers.length
+		i=0
+		while i < len
+			if baseLayers[i].children[1].innerHTML.slice(1) == baseLayer
+				baseLayers[i].children[0].setAttribute "checked","checked"
+			i++
+		@options.lc.onInputClick()
+	setOverlay : (overlayString)=>
+		overlays = overlayString.split(",")
+		overlayLayers = @options.lc._container.children[1].children[2].children
+		len = overlayLayers.length
+		i=0
+		while i < len
+			if overlayLayers[i].children[1].innerHTML.slice(1) in overlays
+				overlayLayers[i].children[0].checked = true
+			else
+				overlayLayers[i].children[0].checked = false
+			i++
+		@options.lc.onInputClick()
+		
 L.Hash = Hash
 
 L.hash = (map,options={})->
@@ -91,7 +136,7 @@ L.Map.include
 			@on "load",()=>
 				@_hash =  new Hash(@,options)
 		@
-	removeHash=()->
+	removeHash:()->
 		@_hash.remove()
 		@
 
