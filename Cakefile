@@ -5,7 +5,7 @@ uglifyjs = require 'uglify-js'
 task 'build', 'build it', () ->
 	fs.readFile './src/leaflet.hash.coffee', 'utf8', (e,d)->
 		unless e
-			fs.writeFile './dist/leaflet-hash.js', coffee.compile d
+			fs.writeFile './dist/leaflet.hash.js', coffee.compile d
 			console.log "compliled"
 			
 task 'min', 'build it small', () ->
