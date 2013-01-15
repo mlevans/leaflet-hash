@@ -18,3 +18,7 @@ task 'min', 'build it small', () ->
 			ast.mangle_names();
 			fs.writeFile './leaflet-hash.min.js', ast.print_to_string()
 			console.log "minified"
+
+task 'all', 'build it all', () ->
+	invoke 'build'
+	invoke 'min'
