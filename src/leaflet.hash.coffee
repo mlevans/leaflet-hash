@@ -85,7 +85,11 @@ L.hash = (map,options={})->
 
 L.Map.include
 	addHash:(options={})->
-		@_hash =  new Hash(@,options)
+		if @_loaded
+			@_hash =  new Hash(@,options)
+		else
+			@on "load",()=>
+				@_hash =  new Hash(@,options)
 		@
 	removeHash=()->
 		@_hash.remove()
