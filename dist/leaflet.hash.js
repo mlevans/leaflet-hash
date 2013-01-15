@@ -146,10 +146,17 @@
 
   L.Map.include({
     addHash: function(options) {
+      var _this = this;
       if (options == null) {
         options = {};
       }
-      this._hash = new Hash(this, options);
+      if (this._loaded) {
+        this._hash = new Hash(this, options);
+      } else {
+        this.on("load", function() {
+          return _this._hash = new Hash(_this, options);
+        });
+      }
       return this;
     }
   }, removeHash = function() {
