@@ -1,5 +1,5 @@
 (function() {
-  var Hash,
+  var Hash, removeHash,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Hash = (function() {
@@ -123,14 +123,20 @@
 
   })();
 
-  L.Map.prototype.addHash = function() {
-    this._hash = new Hash(this);
-    return this;
+  L.Hash = Hash;
+
+  L.hash = function(map) {
+    return new L.Hash;
   };
 
-  L.Map.prototype.removeHash = function() {
+  L.Map.include({
+    addHash: function() {
+      this._hash = new Hash(this);
+      return this;
+    }
+  }, removeHash = function() {
     this._hash.remove();
     return this;
-  };
+  });
 
 }).call(this);
