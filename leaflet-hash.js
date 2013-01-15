@@ -151,10 +151,12 @@
     L.Map.include({
         addHash: function(){
             this._hash = L.hash(this);
+            return this;
         },
 
         removeHash: function(){
-        this._hash.remove();
+            this._hash.remove();
+            return this;
         }
     });
 })(window);
