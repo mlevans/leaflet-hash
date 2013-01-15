@@ -4,12 +4,16 @@
 
   Hash = (function() {
 
-    function Hash(map) {
+    function Hash(map, options) {
       this.map = map;
+      this.options = options != null ? options : {};
       this.remove = __bind(this.remove, this);
 
       this.formatHash = __bind(this.formatHash, this);
 
+      if (!this.options.path) {
+        this.options.path = '{z}/{lat}/{lng}';
+      }
       if (history.pushState) {
         this.withPushState();
       } else {
@@ -76,15 +80,19 @@
     };
 
     Hash.prototype.parseHash = function(hash) {
-      var args, lat, lon, zoom;
-      if (hash.indexOf('#') === 0) {
+      var args, lat, latIndex, lngIndex, lon, path, zIndex, zoom;
+      path = this.options.path.split("/");
+      zIndex = path.indexOf("{z}");
+      latIndex = path.indexOf("{lat}");
+      lngIndex = path.indexOf("{lng}");
+      if (hash.indexOf("#") === 0) {
         hash = hash.substr(1);
       }
       args = hash.split("/");
-      if (args.length === 3) {
-        zoom = parseInt(args[0], 10);
-        lat = parseFloat(args[1]);
-        lon = parseFloat(args[2]);
+      if (args.length === path.length) {
+        zoom = parseInt(args[zIndex], 10);
+        lat = parseFloat(args[latIndex]);
+        lon = parseFloat(args[lngIndex]);
         if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
           return false;
         } else {
@@ -107,7 +115,11 @@
         {
           center: center,
           zoom: zoom
-        }, "a", '#' + [zoom, center.lat.toFixed(precision), center.lng.toFixed(precision)].join("/")
+        }, "a", '#' + L.Util.template(this.options.path, {
+          lat: center.lat.toFixed(precision),
+          lng: center.lng.toFixed(precision),
+          z: zoom
+        })
       ];
     };
 
@@ -125,13 +137,19 @@
 
   L.Hash = Hash;
 
-  L.hash = function(map) {
-    return new L.Hash;
+  L.hash = function(map, options) {
+    if (options == null) {
+      options = {};
+    }
+    return new L.Hash(map, options);
   };
 
   L.Map.include({
-    addHash: function() {
-      this._hash = new Hash(this);
+    addHash: function(options) {
+      if (options == null) {
+        options = {};
+      }
+      this._hash = new Hash(this, options);
       return this;
     }
   }, removeHash = function() {
