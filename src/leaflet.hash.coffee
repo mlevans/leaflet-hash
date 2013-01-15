@@ -1,5 +1,7 @@
 class Hash
-	constructor: (@map) ->
+	constructor: (@map,@options={}) ->
+		unless @options.path
+			@options.path = '{z}/{lat}/{lng}'
 		if history.pushState
 			@withPushState()
 		else
@@ -40,28 +42,36 @@ class Hash
 			@hashChangeInterval = setInterval onHashChange, 50
 
 	parseHash : (hash) ->
-		if hash.indexOf('#') == 0
-			hash = hash.substr(1);
-		args = hash.split("/");
-		if (args.length == 3) 
-			zoom = parseInt(args[0], 10)
-			lat = parseFloat(args[1])
-			lon = parseFloat(args[2])
-			if  isNaN(zoom) or isNaN(lat) or isNaN(lon)
-				return false;
+		path = @options.path.split("/")
+		zIndex = path.indexOf("{z}")
+		latIndex = path.indexOf("{lat}")
+		lngIndex = path.indexOf("{lng}")
+		hash = hash.substr(1)  if hash.indexOf("#") is 0
+		args = hash.split("/")
+		if args.length is path.length
+			zoom = parseInt(args[zIndex], 10)
+			lat = parseFloat(args[latIndex])
+			lon = parseFloat(args[lngIndex])
+			if isNaN(zoom) or isNaN(lat) or isNaN(lon)
+				false
 			else
-				return {
-					center: new L.LatLng(lat, lon)
-					zoom: zoom
-				}
+				center: new L.LatLng(lat, lon)
+				zoom: zoom
 		else
-			return false;
+			false
     
 	formatHash : () =>
 		center = @map.getCenter()
 		zoom = @map.getZoom()
 		precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2))
-		[{center:center,zoom:zoom},"a",'#' + [zoom,center.lat.toFixed(precision),center.lng.toFixed(precision)].join("/")]
+		[
+			{center:center,zoom:zoom}
+			"a"
+			'#'+L.Util.template @options.path,
+				lat:center.lat.toFixed(precision)
+				lng:center.lng.toFixed(precision)
+				z:zoom
+		]
 	
 	remove : ()=>
 		@map.off "moveend"
@@ -70,13 +80,14 @@ class Hash
 		location.hash=""
 L.Hash = Hash
 
-L.hash = (map)->
-	return new L.Hash
+L.hash = (map,options={})->
+	return new L.Hash(map,options)
 
 L.Map.include
-	addHash:()->
-		@_hash =  new Hash(@)
+	addHash:(options={})->
+		@_hash =  new Hash(@,options)
 		@
 	removeHash=()->
 		@_hash.remove()
 		@
+
