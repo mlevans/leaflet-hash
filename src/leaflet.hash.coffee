@@ -68,10 +68,15 @@ class Hash
 		if window.onpopstate
 			window.onpopstate = null
 		location.hash=""
-L.Map::addHash=()->
-	@_hash =  new Hash(@)
-	@
+L.Hash = Hash
 
-L.Map::removeHash=()->
-	@_hash.remove()
-	@
+L.hash = (map)->
+	return new L.Hash
+
+L.Map.include
+	addHash:()->
+		@_hash =  new Hash(@)
+		@
+	removeHash=()->
+		@_hash.remove()
+		@
