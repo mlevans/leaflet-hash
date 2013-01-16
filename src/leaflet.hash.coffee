@@ -6,9 +6,15 @@ class Hash
 			else
 				@options.path = '{z}/{lat}/{lng}'
 		if history.pushState
-			@withPushState()
+			if @map._loaded
+				@withPushState()
+			else	
+				@map.on "load", @withPushState
 		else
-			@withoutPushState()
+			if @map._loaded
+				@withoutPushState()
+			else
+				@map.on "load", @withPushState
 	withPushState : ->
 		window.onpopstate=(event)=>
 			if event.state
@@ -69,11 +75,14 @@ class Hash
 			if isNaN(zoom) or isNaN(lat) or isNaN(lon)
 				false
 			else
-				center: new L.LatLng(lat, lon)
-				zoom: zoom
-			if args > 3
-				@setBase args[baseIndex]
+				out ={
+					center: new L.LatLng(lat, lon)
+					zoom: zoom
+				}
+			if args.length > 3
+				out.base = args[baseIndex]
 				#@setOverlay args[overlayIndex]
+			out
 		else
 			false
     
