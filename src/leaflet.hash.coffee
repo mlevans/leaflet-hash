@@ -51,6 +51,8 @@ class Hash
 				if location.hash
 					parsed = @parseHash location.hash
 					@map.setView parsed.center, parsed.zoom
+					if parsed.base
+						@setBase parsed.base
 		else
 			onHashChange = ()=>
 				pstate = @formatHash()
