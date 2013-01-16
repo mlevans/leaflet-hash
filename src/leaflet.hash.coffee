@@ -102,7 +102,7 @@ class Hash
 		len = baseLayers.children.length
 		i=0
 		while i < len
-			if baseLayers.children[i].innerText.slice(1) == baseLayer
+			if baseLayers.children[i].children[1].innerHTML.slice(1) == baseLayer
 				baseLayers.children[i].children[0].checked=true
 			i++
 		@options.lc._onInputClick()
