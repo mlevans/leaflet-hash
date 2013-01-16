@@ -2,7 +2,7 @@ class Hash
 	constructor: (@map,@options={}) ->
 		unless @options.path
 			if @options.lc
-				@options.path = '{z}/{lat}/{lng}/{base}/{overlay}'
+				@options.path = '{z}/{lat}/{lng}/{base}'#/{overlay}'
 			else
 				@options.path = '{z}/{lat}/{lng}'
 		if history.pushState
@@ -13,12 +13,18 @@ class Hash
 		window.onpopstate=(event)=>
 			if event.state
 				@map.setView event.state.center, event.state.zoom
+				if event.state.base
+					@setBase event.state.base
+				#if event.state.overlay
+				#	@setOverlay event.state.overlay.join(",")
 		if location.hash
 			parsed = @parseHash location.hash
 			@map.setView parsed.center, parsed.zoom
+			if parsed.base
+				@setBase parsed.base
 		else
 			history.replaceState @formatHash()...
-		@map.on "moveend", ()=>
+		@map.on "moveend baselayerchange", ()=>
 			pstate = @formatHash()
 			if location.hash != pstate[2]
 				history.pushState pstate...
@@ -26,9 +32,11 @@ class Hash
 		if location.hash
 			parsed = @parseHash location.hash
 			@map.setView parsed.center, parsed.zoom
+			if parsed.base
+				@setBase parsed.base
 		else
 			location.hash = @formatHash()[2]
-		@map.on "moveend", ()=>
+		@map.on "moveend baselayerchange", ()=>
 			pstate = @formatHash()
 			if location.hash != pstate[2]
 				location.hash = pstate[2]
@@ -51,7 +59,7 @@ class Hash
 		lngIndex = path.indexOf("{lng}")
 		if @options.lc
 			baseIndex = path.indexOf("{base}")
-			overlayIndex = path.indexOf("{overlay}")
+			#overlayIndex = path.indexOf("{overlay}")
 		hash = hash.substr(1)  if hash.indexOf("#") is 0
 		args = hash.split("/")
 		if args.length > 2
@@ -63,9 +71,9 @@ class Hash
 			else
 				center: new L.LatLng(lat, lon)
 				zoom: zoom
-			if args > 4
+			if args > 3
 				@setBase args[baseIndex]
-				@setOverlay args[overlayIndex]
+				#@setOverlay args[overlayIndex]
 		else
 			false
     
@@ -79,8 +87,9 @@ class Hash
 			layers = @getLayers()
 			state.base=layers[0]
 			template.base=layers[0]
-			state.overlay=layers[1]
-			template.overlay = layers[1].join(",")
+			#state.overlay=layers[1]
+			#template.overlay = layers[1].join(",") if layers[1]
+			#template.overlay = "-" unless layers[1]
 		[
 			state
 			"a"
@@ -107,10 +116,12 @@ class Hash
 		i=0
 		while i < len
 			if baseLayers[i].children[1].innerHTML.slice(1) == baseLayer
-				baseLayers[i].children[0].setAttribute "checked","checked"
+				baseLayers[i].children[0].checked=true
 			i++
-		@options.lc.onInputClick()
+		@options.lc._onInputClick()
 	setOverlay : (overlayString)=>
+		if overlayString == "-"
+			return
 		overlays = overlayString.split(",")
 		overlayLayers = @options.lc._container.children[1].children[2].children
 		len = overlayLayers.length
@@ -121,20 +132,20 @@ class Hash
 			else
 				overlayLayers[i].children[0].checked = false
 			i++
-		@options.lc.onInputClick()
-		
+		@options.lc._onInputClick()
+
 L.Hash = Hash
 
-L.hash = (map,options={})->
-	return new L.Hash(map,options)
+L.hash = (params...)->
+	return new L.Hash(params...)
 
 L.Map.include
-	addHash:(options={})->
+	addHash:(params...)->
 		if @_loaded
-			@_hash =  new Hash(@,options)
+			@_hash =  new Hash(@,params...)
 		else
 			@on "load",()=>
-				@_hash =  new Hash(@,options)
+				@_hash =  new Hash(@,params...)
 		@
 	removeHash:()->
 		@_hash.remove()
