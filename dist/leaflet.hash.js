@@ -19,6 +19,10 @@
 
       this.formatHash = __bind(this.formatHash, this);
 
+      this.updateFromState = __bind(this.updateFromState, this);
+
+      this.startListning = __bind(this.startListning, this);
+
       if (!this.options.path) {
         if (this.options.lc) {
           this.options.path = '{z}/{lat}/{lng}/{base}';
@@ -26,80 +30,39 @@
           this.options.path = '{z}/{lat}/{lng}';
         }
       }
-      if (history.pushState) {
-        if (this.map._loaded) {
-          this.withPushState();
-        } else {
-          this.map.on("load", this.withPushState);
-        }
+      if (this.map._loaded) {
+        this.startListning();
       } else {
-        if (this.map._loaded) {
-          this.withoutPushState();
-        } else {
-          this.map.on("load", this.withPushState);
-        }
+        this.map.on("load", this.startListning);
       }
     }
 
-    Hash.prototype.withPushState = function() {
-      var parsed,
-        _this = this;
-      window.onpopstate = function(event) {
-        if (event.state) {
-          _this.map.setView(event.state.center, event.state.zoom);
-          if (event.state.base) {
-            return _this.setBase(event.state.base);
-          }
-        }
-      };
-      if (location.hash) {
-        parsed = this.parseHash(location.hash);
-        this.map.setView(parsed.center, parsed.zoom);
-        if (parsed.base) {
-          this.setBase(parsed.base);
-        }
-      } else {
-        history.replaceState.apply(history, this.formatHash());
-      }
-      return this.map.on("moveend baselayerchange", function() {
-        var pstate;
-        pstate = _this.formatHash();
-        if (location.hash !== pstate[2]) {
-          return history.pushState.apply(history, pstate);
-        }
-      });
-    };
-
-    Hash.prototype.withoutPushState = function() {
-      var onHashChange, parsed,
+    Hash.prototype.startListning = function() {
+      var onHashChange,
         _this = this;
       if (location.hash) {
-        parsed = this.parseHash(location.hash);
-        this.map.setView(parsed.center, parsed.zoom);
-        if (parsed.base) {
-          this.setBase(parsed.base);
-        }
-      } else {
-        location.hash = this.formatHash()[2];
+        this.updateFromState(this.parseHash(location.hash));
       }
-      this.map.on("moveend baselayerchange", function() {
-        var pstate;
-        pstate = _this.formatHash();
-        if (location.hash !== pstate[2]) {
-          return location.hash = pstate[2];
+      if (history.pushState) {
+        if (!location.hash) {
+          history.replaceState.apply(history, this.formatHash());
         }
-      });
-      if (('onhashchange' in window) && (window.documentMode === void 0 || window.documentMode > 7)) {
-        return window.onhashchange = function() {
-          if (location.hash) {
-            parsed = _this.parseHash(location.hash);
-            _this.map.setView(parsed.center, parsed.zoom);
-            if (parsed.base) {
-              return _this.setBase(parsed.base);
-            }
+        window.onpopstate = function(event) {
+          if (event.state) {
+            return _this.updateFromState(event.state);
           }
         };
+        return this.map.on("moveend baselayerchange", function() {
+          var pstate;
+          pstate = _this.formatHash();
+          if (location.hash !== pstate[2]) {
+            return history.pushState.apply(history, pstate);
+          }
+        });
       } else {
+        if (!location.hash) {
+          location.hash = this.formatHash()[2];
+        }
         onHashChange = function() {
           var pstate;
           pstate = _this.formatHash();
@@ -107,7 +70,16 @@
             return location.hash = pstate[2];
           }
         };
-        return this.hashChangeInterval = setInterval(onHashChange, 50);
+        this.map.on("moveend baselayerchange", onHashChange);
+        if (('onhashchange' in window) && (window.documentMode === void 0 || window.documentMode > 7)) {
+          return window.onhashchange = function() {
+            if (location.hash) {
+              return _this.updateFromState(_this.parseHash(location.hash));
+            }
+          };
+        } else {
+          return this.hashChangeInterval = setInterval(onHashChange, 50);
+        }
       }
     };
 
@@ -129,7 +101,7 @@
         lat = parseFloat(args[latIndex]);
         lon = parseFloat(args[lngIndex]);
         if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
-          false;
+          return false;
         } else {
           out = {
             center: new L.LatLng(lat, lon),
@@ -142,6 +114,13 @@
         return out;
       } else {
         return false;
+      }
+    };
+
+    Hash.prototype.updateFromState = function(state) {
+      this.map.setView(state.center, state.zoom);
+      if (state.base) {
+        return this.setBase(state.base);
       }
     };
 
@@ -192,12 +171,12 @@
 
     Hash.prototype.setBase = function(baseLayer) {
       var baseLayers, i, len;
-      baseLayers = this.options.lc._container.children[1].children[0].children;
-      len = baseLayers.length;
+      baseLayers = this.options.lc._baseLayersList;
+      len = baseLayers.children.length;
       i = 0;
       while (i < len) {
-        if (baseLayers[i].children[1].innerHTML.slice(1) === baseLayer) {
-          baseLayers[i].children[0].checked = true;
+        if (baseLayers.children[i].children[1].innerHTML.slice(1) === baseLayer) {
+          baseLayers.children[i].children[0].checked = true;
         }
         i++;
       }
