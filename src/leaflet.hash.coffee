@@ -5,61 +5,32 @@ class Hash
 				@options.path = '{z}/{lat}/{lng}/{base}'#/{overlay}'
 			else
 				@options.path = '{z}/{lat}/{lng}'
+		if @map._loaded
+			@startListning()
+		else	
+			@map.on "load", @startListning
+	startListning : =>
+		@updateFromState @parseHash(location.hash) if location.hash
 		if history.pushState
-			if @map._loaded
-				@withPushState()
-			else	
-				@map.on "load", @withPushState
+			history.replaceState(@formatHash()...) unless location.hash
+			window.onpopstate=(event)=>
+				@updateFromState(event.state) if event.state
+			@map.on "moveend baselayerchange", ()=>
+				pstate = @formatHash()
+				if location.hash != pstate[2]
+					history.pushState pstate...
 		else
-			if @map._loaded
-				@withoutPushState()
-			else
-				@map.on "load", @withPushState
-	withPushState : ->
-		window.onpopstate=(event)=>
-			if event.state
-				@map.setView event.state.center, event.state.zoom
-				if event.state.base
-					@setBase event.state.base
-				#if event.state.overlay
-				#	@setOverlay event.state.overlay.join(",")
-		if location.hash
-			parsed = @parseHash location.hash
-			@map.setView parsed.center, parsed.zoom
-			if parsed.base
-				@setBase parsed.base
-		else
-			history.replaceState @formatHash()...
-		@map.on "moveend baselayerchange", ()=>
-			pstate = @formatHash()
-			if location.hash != pstate[2]
-				history.pushState pstate...
-	withoutPushState : ->
-		if location.hash
-			parsed = @parseHash location.hash
-			@map.setView parsed.center, parsed.zoom
-			if parsed.base
-				@setBase parsed.base
-		else
-			location.hash = @formatHash()[2]
-		@map.on "moveend baselayerchange", ()=>
-			pstate = @formatHash()
-			if location.hash != pstate[2]
-				location.hash = pstate[2]
-		if ('onhashchange' of window) and (window.documentMode == undefined or window.documentMode > 7)
-			window.onhashchange = ()=>
-				if location.hash
-					parsed = @parseHash location.hash
-					@map.setView parsed.center, parsed.zoom
-					if parsed.base
-						@setBase parsed.base
-		else
+			location.hash = @formatHash()[2] unless location.hash
 			onHashChange = ()=>
 				pstate = @formatHash()
 				if location.hash != pstate[2]
 					location.hash = pstate[2]
-			@hashChangeInterval = setInterval onHashChange, 50
-
+			@map.on "moveend baselayerchange", onHashChange
+			if ('onhashchange' of window) and (window.documentMode == undefined or window.documentMode > 7)
+				window.onhashchange = ()=>
+					@updateFromState @parseHash(location.hash) if location.hash
+			else
+				@hashChangeInterval = setInterval onHashChange, 50
 	parseHash : (hash) ->
 		path = @options.path.split("/")
 		zIndex = path.indexOf("{z}")
@@ -75,7 +46,7 @@ class Hash
 			lat = parseFloat(args[latIndex])
 			lon = parseFloat(args[lngIndex])
 			if isNaN(zoom) or isNaN(lat) or isNaN(lon)
-				false
+				return false
 			else
 				out ={
 					center: new L.LatLng(lat, lon)
@@ -83,11 +54,16 @@ class Hash
 				}
 			if args.length > 3
 				out.base = args[baseIndex]
-				#@setOverlay args[overlayIndex]
+				#out.overlay = args[overlayIndex]
 			out
 		else
 			false
-    
+	updateFromState : (state)=>
+		@map.setView state.center, state.zoom
+		if state.base
+			@setBase state.base
+		#if state.overlay
+		#	@setOverlay state.overlay.join(",")
 	formatHash : () =>
 		center = @map.getCenter()
 		zoom = @map.getZoom()
@@ -122,12 +98,12 @@ class Hash
 					out[0] = @options.lc._layers[key].name
 		out
 	setBase : (baseLayer)=>
-		baseLayers = @options.lc._container.children[1].children[0].children
-		len = baseLayers.length
+		baseLayers = @options.lc._baseLayersList
+		len = baseLayers.children.length
 		i=0
 		while i < len
-			if baseLayers[i].children[1].innerHTML.slice(1) == baseLayer
-				baseLayers[i].children[0].checked=true
+			if baseLayers.children[i].children[1].innerHTML.slice(1) == baseLayer
+				baseLayers.children[i].children[0].checked=true
 			i++
 		@options.lc._onInputClick()
 	setOverlay : (overlayString)=>
