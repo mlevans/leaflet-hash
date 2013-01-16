@@ -73,9 +73,9 @@
         
         onMapMove: function(map) {
             // bail if we're moving the map (updating from a hash),
-            // or if the map has no zoom set
+            // or if the map is not yet loaded
             
-            if (this.movingMap || this.map.getZoom() === 0) {
+            if (this.movingMap || !this.map._loaded) {
                 return false;
             }
             
