@@ -143,13 +143,20 @@
             this.isListening = false;
         }
     };
+
     L.hash = function(map){
-        return new L.Hash(map);	
+        return new L.Hash(map);
     };
-    L.Map.prototype.addHash = function(){
-		this._hash = L.hash(this);
-	};
-	L.Map.prototype.removeHash = function(){
-		this._hash.remove();
-	}
+
+    L.Map.include({
+        addHash: function(){
+            this._hash = L.hash(this);
+            return this;
+        },
+
+        removeHash: function(){
+            this._hash.remove();
+            return this;
+        }
+    });
 })(window);
