@@ -93,7 +93,10 @@
         return window.onhashchange = function() {
           if (location.hash) {
             parsed = _this.parseHash(location.hash);
-            return _this.map.setView(parsed.center, parsed.zoom);
+            _this.map.setView(parsed.center, parsed.zoom);
+            if (parsed.base) {
+              return _this.setBase(parsed.base);
+            }
           }
         };
       } else {
