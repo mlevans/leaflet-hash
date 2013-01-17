@@ -22,10 +22,22 @@
 
       if (!this.options.path) {
         if (this.options.lc) {
-          this.options.path = '{z}/{lat}/{lng}/{base}';
+          this.options.path = '{base}/{z}/{lat}/{lng}';
         } else {
           this.options.path = '{z}/{lat}/{lng}';
         }
+      }
+      if (this.options.lc && !this.options.formatBase) {
+        this.options.formatBase = [
+          /[\sA-Z]/g, function(match) {
+            if (match.match(/\s/)) {
+              return "_ ";
+            }
+            if (match.match(/[A-Z]/)) {
+              return match.toLowerCase();
+            }
+          }
+        ];
       }
       if (this.map._loaded) {
         this.startListning();
@@ -79,8 +91,8 @@
         }
       }
       return this.map.on("baselayerchange", function(e) {
-        var pstate;
-        _this.base = _this.options.lc._layers[e.layer._leaflet_id].name;
+        var pstate, _ref;
+        _this.base = (_ref = _this.options.lc._layers[e.layer._leaflet_id].name).replace.apply(_ref, _this.options.formatBase);
         pstate = _this.formatState();
         if (history.pushState) {
           if (location.hash !== pstate[2] && !_this.moving) {
@@ -162,13 +174,13 @@
     };
 
     Hash.prototype.setBase = function(base) {
-      var i, inputs, len;
+      var i, inputs, len, _ref;
       this.base = base;
       inputs = this.options.lc._form.getElementsByTagName('input');
       len = inputs.length;
       i = 0;
       while (i < len) {
-        if (inputs[i].name === 'leaflet-base-layers' && this.options.lc._layers[inputs[i].layerId].name === base) {
+        if (inputs[i].name === 'leaflet-base-layers' && (_ref = this.options.lc._layers[inputs[i].layerId].name).replace.apply(_ref, this.options.formatBase) === base) {
           inputs[i].checked = true;
           this.options.lc._onInputClick();
           return true;
@@ -178,7 +190,7 @@
     };
 
     Hash.prototype.getBase = function() {
-      var i, inputs, len;
+      var i, inputs, len, _ref;
       if (this.base) {
         return this.base;
       }
@@ -187,7 +199,7 @@
       i = 0;
       while (i < len) {
         if (inputs[i].name === 'leaflet-base-layers' && inputs[i].checked) {
-          this.base = this.options.lc._layers[inputs[i].layerId].name;
+          this.base = (_ref = this.options.lc._layers[inputs[i].layerId].name).replace.apply(_ref, this.options.formatBase);
           return this.base;
         }
       }
