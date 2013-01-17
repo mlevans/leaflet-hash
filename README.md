@@ -20,7 +20,11 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
         // Assuming your map instance is in a variable called map
         map.addHash();
     ```
-    
+4. optionally you can pass a an object with a few options
+	* lc: pass an instance of L.Control.Layer, the baselayers will be put in the hash
+	* path: template for the url hash, defaults to '{z}/{lat}/{lng}' or '{base}/{z}/{lat}/{lng}' if lc is specified, parts need to be seperated by "/"
+	* formatBase: an array of length 2 that will be used as the arguments of the overlay names before they go into the url hash, the default turns whitespace to underscores and all lowercase just pass "[//]" if you want it unchanged
+
 ### Hacking Around
 
 1. Build with cake,
