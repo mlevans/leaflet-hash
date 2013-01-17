@@ -2,7 +2,7 @@ class Hash
 	constructor: (@map,@options={}) ->
 		unless @options.path
 			if @options.lc
-				@options.path = '{z}/{lat}/{lng}/{base}'
+				@options.path = '{base}/{z}/{lat}/{lng}'
 			else
 				@options.path = '{z}/{lat}/{lng}'
 		if @map._loaded
