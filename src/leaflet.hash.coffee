@@ -9,8 +9,8 @@ class Hash
 			@options.formatBase = [
 				/[\sA-Z]/
 				(match)->
-					_ if match.matches /\s/
-					match.toLowerCase() if match.maches /[A-Z]/
+					return "_ " if match.match /\s/
+					return match.toLowerCase() if match.match /[A-Z]/
 			]		
 		if @map._loaded
 			@startListning()
