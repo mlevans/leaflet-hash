@@ -131,14 +131,12 @@
       if (this.moving) {
         return;
       }
-      console.log("moving");
       this.moving = true;
       this.map.setView(state.center, state.zoom);
       if (state.base) {
         this.setBase(state.base);
       }
       this.moving = false;
-      console.log("not moving");
       return true;
     };
 

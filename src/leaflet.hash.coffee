@@ -68,12 +68,10 @@ class Hash
 			false
 	updateFromState : (state)=>
 		return if @moving
-		console.log "moving"
 		@moving = true
 		@map.setView state.center, state.zoom
 		@setBase state.base if state.base
 		@moving = false
-		console.log "not moving"
 		true
 	formatState : () =>
 		center = @map.getCenter()
