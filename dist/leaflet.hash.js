@@ -10,14 +10,22 @@
       this.options = options != null ? options : {};
       this.remove = __bind(this.remove, this);
 
-      this.formatHash = __bind(this.formatHash, this);
+      this.getBase = __bind(this.getBase, this);
+
+      this.setBase = __bind(this.setBase, this);
+
+      this.formatState = __bind(this.formatState, this);
 
       this.updateFromState = __bind(this.updateFromState, this);
 
       this.startListning = __bind(this.startListning, this);
 
       if (!this.options.path) {
-        this.options.path = '{z}/{lat}/{lng}';
+        if (this.options.lc) {
+          this.options.path = '{z}/{lat}/{lng}/{base}';
+        } else {
+          this.options.path = '{z}/{lat}/{lng}';
+        }
       }
       if (this.map._loaded) {
         this.startListning();
@@ -34,42 +42,56 @@
       }
       if (history.pushState) {
         if (!location.hash) {
-          history.replaceState.apply(history, this.formatHash());
+          history.replaceState.apply(history, this.formatState());
         }
         window.onpopstate = function(event) {
           if (event.state) {
             return _this.updateFromState(event.state);
           }
         };
-        return this.map.on("moveend", function() {
+        this.map.on("moveend", function() {
           var pstate;
-          pstate = _this.formatHash();
-          if (location.hash !== pstate[2]) {
+          pstate = _this.formatState();
+          if (location.hash !== pstate[2] && !_this.moving) {
             return history.pushState.apply(history, pstate);
           }
         });
       } else {
         if (!location.hash) {
-          location.hash = this.formatHash()[2];
+          location.hash = this.formatState()[2];
         }
         onHashChange = function() {
           var pstate;
-          pstate = _this.formatHash();
-          if (location.hash !== pstate[2]) {
+          pstate = _this.formatState();
+          if (location.hash !== pstate[2] && !_this.moving) {
             return location.hash = pstate[2];
           }
         };
         this.map.on("moveend", onHashChange);
         if (('onhashchange' in window) && (window.documentMode === void 0 || window.documentMode > 7)) {
-          return window.onhashchange = function() {
+          window.onhashchange = function() {
             if (location.hash) {
               return _this.updateFromState(_this.parseHash(location.hash));
             }
           };
         } else {
-          return this.hashChangeInterval = setInterval(onHashChange, 50);
+          this.hashChangeInterval = setInterval(onHashChange, 50);
         }
       }
+      return this.map.on("baselayerchange", function(e) {
+        var pstate;
+        _this.base = _this.options.lc._layers[e.layer._leaflet_id].name;
+        pstate = _this.formatState();
+        if (history.pushState) {
+          if (location.hash !== pstate[2] && !_this.moving) {
+            return history.pushState.apply(history, pstate);
+          }
+        } else {
+          if (location.hash !== pstate[2] && !_this.moving) {
+            return location.hash = pstate[2];
+          }
+        }
+      });
     };
 
     Hash.prototype.parseHash = function(hash) {
@@ -89,10 +111,16 @@
         if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
           return false;
         } else {
-          return out = {
+          out = {
             center: new L.LatLng(lat, lon),
             zoom: zoom
           };
+          if (args.length > 3) {
+            out.base = args[path.indexOf("{base}")];
+            return out;
+          } else {
+            return out;
+          }
         }
       } else {
         return false;
@@ -100,10 +128,21 @@
     };
 
     Hash.prototype.updateFromState = function(state) {
-      return this.map.setView(state.center, state.zoom);
+      if (this.moving) {
+        return;
+      }
+      console.log("moving");
+      this.moving = true;
+      this.map.setView(state.center, state.zoom);
+      if (state.base) {
+        this.setBase(state.base);
+      }
+      this.moving = false;
+      console.log("not moving");
+      return true;
     };
 
-    Hash.prototype.formatHash = function() {
+    Hash.prototype.formatState = function() {
       var center, precision, state, template, zoom;
       center = this.map.getCenter();
       zoom = this.map.getZoom();
@@ -117,7 +156,44 @@
         lng: center.lng.toFixed(precision),
         z: zoom
       };
+      if (this.options.path.indexOf("{base}") > -1) {
+        state.base = this.getBase();
+        template.base = state.base;
+      }
       return [state, "a", '#' + L.Util.template(this.options.path, template)];
+    };
+
+    Hash.prototype.setBase = function(base) {
+      var i, inputs, len;
+      this.base = base;
+      inputs = this.options.lc._form.getElementsByTagName('input');
+      len = inputs.length;
+      i = 0;
+      while (i < len) {
+        if (inputs[i].name === 'leaflet-base-layers' && this.options.lc._layers[inputs[i].layerId].name === base) {
+          inputs[i].checked = true;
+          this.options.lc._onInputClick();
+          return true;
+        }
+        i++;
+      }
+    };
+
+    Hash.prototype.getBase = function() {
+      var i, inputs, len;
+      if (this.base) {
+        return this.base;
+      }
+      inputs = this.options.lc._form.getElementsByTagName('input');
+      len = inputs.length;
+      i = 0;
+      while (i < len) {
+        if (inputs[i].name === 'leaflet-base-layers' && inputs[i].checked) {
+          this.base = this.options.lc._layers[inputs[i].layerId].name;
+          return this.base;
+        }
+      }
+      return false;
     };
 
     Hash.prototype.remove = function() {
