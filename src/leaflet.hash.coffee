@@ -7,7 +7,7 @@ class Hash
 				@options.path = '{z}/{lat}/{lng}'
 		if @options.lc and not @options.formatBase
 			@options.formatBase = [
-				/[\sA-Z]/
+				/[\sA-Z]/g
 				(match)->
 					return "_ " if match.match /\s/
 					return match.toLowerCase() if match.match /[A-Z]/
@@ -39,7 +39,7 @@ class Hash
 			else
 				@hashChangeInterval = setInterval onHashChange, 50
 		@map.on "baselayerchange", (e)=>
-			@base = @options.lc._layers[e.layer._leaflet_id].name
+			@base = @options.lc._layers[e.layer._leaflet_id].name.replace(@options.formatBase...)
 			pstate = @formatState()
 			if history.pushState
 				if location.hash != pstate[2] and !@moving
