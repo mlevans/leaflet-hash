@@ -38,15 +38,16 @@ class Hash
 					@updateFromState @parseHash(location.hash) if location.hash
 			else
 				@hashChangeInterval = setInterval onHashChange, 50
-		@map.on "baselayerchange", (e)=>
-			@base = @options.lc._layers[e.layer._leaflet_id].name.replace(@options.formatBase...)
-			pstate = @formatState()
-			if history.pushState
-				if location.hash != pstate[2] and !@moving
-					history.pushState pstate...
-			else
-				if location.hash != pstate[2] and !@moving
-					location.hash = pstate[2]
+		if @options.lc
+			@map.on "baselayerchange", (e)=>
+				@base = @options.lc._layers[e.layer._leaflet_id].name.replace(@options.formatBase...)
+				pstate = @formatState()
+				if history.pushState
+					if location.hash != pstate[2] and !@moving
+						history.pushState pstate...
+				else
+					if location.hash != pstate[2] and !@moving
+						location.hash = pstate[2]
 				
 	parseHash : (hash) ->
 		path = @options.path.split("/")
