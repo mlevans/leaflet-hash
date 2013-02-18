@@ -1,0 +1,24 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
+  <script src="../node_modules/expect.js/expect.js"></script>
+  <script src="../node_modules/mocha/mocha.js"></script>
+
+  <script src="../lib/leaflet-src.js"></script>
+  <script src="../leaflet-hash.js"></script>
+
+  <script>mocha.setup('bdd')</script>
+
+  <script src="spec/hash.js"></script>
+
+  <script>
+    mocha.run();
+  </script>
+</body>
+</html>
