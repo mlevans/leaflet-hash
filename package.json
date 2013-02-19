@@ -1,19 +1,50 @@
 {
-  "author": "Michael Evans",
-  "name": "leaflet-hash",
-  "description": "linkable location hashes for leaflet",
-  "version": "0.0.0",
-  "homepage": "https://github.com/mlevans/leaflet-hash",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mlevans/leaflet-hash.git"
-  },
-  "devDependencies": {
-      "mocha": "~1.8",
-      "expect.js": "~0.2.0"
-  },
-  "optionalDependencies": {},
-  "engines": {
-    "node": "*"
-  }
+	"name": "leaflet-hash",
+	"version": "0.2.0",
+	"description": "Add url hashes to leaflet",
+	"main": "leaflet-hash.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mlevans/leaflet-hash"
+	},
+	"keywords": [
+		"leaflet",
+		"maping",
+		"hash"
+	],
+	"author": {
+		"name" : "Michael Lawrence Evans",
+		"email" : "michael@codeforamerica.org",
+		"url" : "http://www.mlevans.com/"
+	},
+	"contributors": [{
+			"name" : "Calvin Metcalf",
+			"email" : "calvin.metcalf@state.ma.us",
+			"url" : "http://cwmma.tumblr.com/"
+		},
+	{
+		"name" : "Bobby Sudekum",
+		"url" : "http://www.visuallybs.com/"
+	},
+	{
+		"name" : "Yohan Boniface",
+		"url" : "http://yohanboniface.me/"
+	},
+	{
+		"name" : "Bryan Buchs",
+		"email" : "bryan@bryanbuchs.com",
+		"url" : "http://www.bryanbuchs.com/"
+	},
+    {
+        "name" : "Tom MacWright",
+        "email" : "tom@macwright.org",
+        "url" : "http://macwright.org"
+    }
+		
+	],
+	"license": "MIT",
+	"dependencies": {
+	"expect.js" : ">= 0.0.1",
+		"mocha" : ">= 0.0.1"
+	}
 }
