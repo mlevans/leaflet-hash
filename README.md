@@ -25,11 +25,14 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
 [@mlevans](http://github.com/mlevans)
 
 ### Contributors
+[@calvinmetcalf](http://github.com/calvinmetcalf)
+
 [@rsudekum](http://github.com/rsudekum)
+
+[@tmcw](http://github.com/tmcw)
 
 [@yohanboniface](http://github.com/yohanboniface)
 
-[@calvinmetcalf](http://github.com/calvinmetcalf)
 
 ### License
 
