@@ -15,7 +15,7 @@
         this.options.formatBase = [
           /[\sA-Z]/g, function(match) {
             if (match.match(/\s/)) {
-              return "_ ";
+              return "_";
             }
             if (match.match(/[A-Z]/)) {
               return match.toLowerCase();
