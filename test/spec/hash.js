@@ -14,7 +14,13 @@ describe("L.Hash", function() {
         map.setView([51.505, -0.09], 13);
         expect(location.hash).to.be('#13/51.5050/-0.0900');
     });
-
+    
+    it('sets a hash in the alternat manner', function() {
+        map.addHash();
+        map.setView([51.505, -0.09], 13);
+        expect(location.hash).to.be('#13/51.5050/-0.0900');
+    });
+    
     it('uses a hash set initially on the page', function(done) {
         location.hash = '#13/10/40';
         var hash = L.hash(map);
@@ -46,5 +52,40 @@ describe("L.Hash", function() {
             done();
         }, 200);
     });
-
+    
+    it('sets a hash when the layer changes', function() {
+        var de = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png').addTo(map);
+        var hash = L.hash(map,L.control.layers({"A Layer":de}));
+        map.setView([51.505, -0.09], 13);
+        expect(location.hash).to.be('#a_layer/13/51.5050/-0.0900');
+    });
+    it('uses a hash set initially on the page', function(done) {
+        location.hash = '#a_layer/13/10/40';
+        var hash = L.hash(map,{lc:L.control.layers({"A Layer":L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png')})});
+        window.setTimeout(function() {
+            expect(Math.round(map.getCenter().lat)).to.be(10);
+            expect(Math.round(map.getCenter().lng)).to.be(40);
+            //test which layer is set?
+            done();
+        }, 200);
+    });
+    it('modify the hash options', function() {
+        var de = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png').addTo(map);
+        var hash = L.hash(map,{
+            path : '{z}/{lat}/{lng}/{base}',
+            lc : L.control.layers({"A Layer":de}),
+            formatBase: [
+                /[\sA-Z]/g, function(match) {
+                    if (match.match(/\s/)) {
+                        return "-";
+                    }
+                    if (match.match(/[A-Z]/)) {
+                        return match.toUpperCase();
+                    }
+                }
+            ]
+        });
+        map.setView([51.505, -0.09], 13);
+        expect(location.hash).to.be('#13/51.5050/-0.0900/A-LAYER');
+    });
 });
