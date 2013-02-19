@@ -6,23 +6,27 @@ describe("L.Hash", function() {
         '_leaflet_hashchange16', '_leaflet_hashchange17', '_leaflet_hashchange18']);
 
     beforeEach(function() {
+        location.hash = "";
         map = new L.Map(document.createElement('div'));
     });
 
     it('sets a hash when the map is moved', function() {
+      
         var hash = L.hash(map);
         map.setView([51.505, -0.09], 13);
         expect(location.hash).to.be('#13/51.5050/-0.0900');
     });
     
-    it('sets a hash in the alternat manner', function() {
+    it('sets a hash in the other  manner', function() {
         map.addHash();
         map.setView([51.505, -0.09], 13);
         expect(location.hash).to.be('#13/51.5050/-0.0900');
     });
     
     it('uses a hash set initially on the page', function(done) {
+        
         location.hash = '#13/10/40';
+     
         var hash = L.hash(map);
         window.setTimeout(function() {
             expect(Math.round(map.getCenter().lat)).to.be(10);
@@ -44,8 +48,9 @@ describe("L.Hash", function() {
 
     it('does not acknowledge a junk hash', function(done) {
         var hash = L.hash(map);
-        map.setView([51, 2], 13);
         location.hash = '#foo';
+        map.setView([51, 2], 13);
+        
         window.setTimeout(function() {
             expect(Math.round(map.getCenter().lat)).to.eql(51);
             expect(Math.round(map.getCenter().lng)).to.eql(2);
@@ -55,13 +60,17 @@ describe("L.Hash", function() {
     
     it('sets a hash when the layer changes', function() {
         var de = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png').addTo(map);
-        var hash = L.hash(map,L.control.layers({"A Layer":de}));
+        var hash = L.hash(map,{lc:L.control.layers({"A Layer":de}).addTo(map)});
         map.setView([51.505, -0.09], 13);
         expect(location.hash).to.be('#a_layer/13/51.5050/-0.0900');
     });
     it('uses a hash set initially on the page', function(done) {
         location.hash = '#a_layer/13/10/40';
-        var hash = L.hash(map,{lc:L.control.layers({"A Layer":L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png')})});
+        
+        var lc = L.control.layers({"A Layer":
+        L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png')
+        }).addTo(map);
+        var hash = L.hash(map,{lc:lc});
         window.setTimeout(function() {
             expect(Math.round(map.getCenter().lat)).to.be(10);
             expect(Math.round(map.getCenter().lng)).to.be(40);
@@ -73,13 +82,13 @@ describe("L.Hash", function() {
         var de = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png').addTo(map);
         var hash = L.hash(map,{
             path : '{z}/{lat}/{lng}/{base}',
-            lc : L.control.layers({"A Layer":de}),
+            lc : L.control.layers({"A Layer":de}).addTo(map),
             formatBase: [
-                /[\sA-Z]/g, function(match) {
+                /[\s?a-z]/g, function(match) {
                     if (match.match(/\s/)) {
                         return "-";
                     }
-                    if (match.match(/[A-Z]/)) {
+                    if (match.match(/[a-z]/)) {
                         return match.toUpperCase();
                     }
                 }
