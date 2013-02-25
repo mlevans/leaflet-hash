@@ -71,7 +71,7 @@
 			}
 		},
 
-		onMapMove: function(map) {
+		onMapMove: function() {
 			// bail if we're moving the map (updating from a hash),
 			// or if the map is not yet loaded
 
