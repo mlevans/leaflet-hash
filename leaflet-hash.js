@@ -16,6 +16,8 @@
           /[\sA-Z]/g, function(match) {
             if (match.match(/\s/)) {
               return "_";
+            } else if (match.match(/\:/)) {
+                return "";
             }
             if (match.match(/[A-Z]/)) {
               return match.toLowerCase();
