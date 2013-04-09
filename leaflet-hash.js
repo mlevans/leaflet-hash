@@ -53,8 +53,6 @@
 		init: function(map) {
 			this.map = map;
 
-			this.map.on("moveend", this.onMapMove, this);
-
 			// reset the hash
 			this.lastHash = null;
 			this.onHashChange();
@@ -65,10 +63,15 @@
 		},
 
 		remove: function() {
-			this.map = null;
+			if (this.changeTimeout) {
+				clearTimeout(this.changeTimeout);
+			}
+
 			if (this.isListening) {
 				this.stopListening();
 			}
+
+			this.map = null;
 		},
 
 		onMapMove: function() {
@@ -122,6 +125,8 @@
 		isListening: false,
 		hashChangeInterval: null,
 		startListening: function() {
+			this.map.on("moveend", this.onMapMove, this);
+
 			if (HAS_HASHCHANGE) {
 				L.DomEvent.addListener(window, "hashchange", this.onHashChange);
 			} else {
@@ -132,6 +137,8 @@
 		},
 
 		stopListening: function() {
+			this.map.off("moveend", this.onMapMove, this);
+
 			if (HAS_HASHCHANGE) {
 				L.DomEvent.removeListener(window, "hashchange", this.onHashChange);
 			} else {
