@@ -2,8 +2,7 @@ describe("L.Hash", function() {
 
     var map;
 
-    mocha.globals(['_leaflet_hashchange15', '_leaflet_resize14',
-        '_leaflet_hashchange16', '_leaflet_hashchange17', '_leaflet_hashchange18']);
+    mocha.ignoreLeaks();
 
     beforeEach(function() {
         map = new L.Map(document.createElement('div'));
@@ -47,4 +46,11 @@ describe("L.Hash", function() {
         }, 200);
     });
 
+    it('unbinds events when removed', function() {
+        location.hash = '';
+        var hash = L.hash(map);
+        hash.remove();
+        map.setView([51.505, -0.09], 13);
+        expect(location.hash).to.be('');
+    });
 });
