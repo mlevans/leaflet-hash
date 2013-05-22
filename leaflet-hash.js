@@ -24,11 +24,13 @@
             }
           }
         ];
+      }if (location.hash) {
+        this.updateFromState(this.parseHash(location.hash));
       }
       if (this.map._loaded) {
         return this.startListning();
       } else {
-        return this.map.on("load", this.startListning);
+        return this.map.on("load", this.startListning,this);
       }
     },
     startListning: function() {
@@ -42,6 +44,7 @@
           history.replaceState.apply(history, this.formatState());
         }
         window.onpopstate = function(event) {
+          
           if (event.state) {
             return _this.updateFromState(event.state);
           }
@@ -58,6 +61,7 @@
           location.hash = this.formatState()[2];
         }
         onHashChange = function() {
+          
           var pstate;
           pstate = _this.formatState();
           if (location.hash !== pstate[2] && !_this.moving) {
@@ -68,6 +72,7 @@
         if (('onhashchange' in window) && (window.documentMode === void 0 || window.documentMode > 7)) {
           window.onhashchange = function() {
             if (location.hash) {
+              
               return _this.updateFromState(_this.parseHash(location.hash));
             }
           };
@@ -91,6 +96,7 @@
       });
     },
     parseHash: function(hash) {
+       
       var args, lat, latIndex, lngIndex, lon, out, path, zIndex, zoom;
       path = this.options.path.split("/");
       zIndex = path.indexOf("{z}");
@@ -100,6 +106,7 @@
         hash = hash.substr(1);
       }
       args = hash.split("/");
+ 
       if (args.length > 2) {
         zoom = parseInt(args[zIndex], 10);
         lat = parseFloat(args[latIndex]);
@@ -119,11 +126,12 @@
           }
         }
       } else {
+         
         return false;
       }
     },
     updateFromState: function(state) {
-      if (this.moving) {
+      if (this.moving || !state) {
         return;
       }
       this.moving = true;
@@ -201,13 +209,9 @@
 
   L.Map.include({
     addHash: function(options) {
-      if (this._loaded) {
+  
         this._hash = L.hash(this, options);
-      } else {
-        this.on("load", function() {
-          return this._hash = L.hash(this, options);
-        });
-      }
+    
       return this;
     },
     removeHash: function() {
