@@ -27,6 +27,8 @@ You can view a demo of leaflet-hash at [mlevans.github.com/leaflet-hash/map.html
 ### Contributors
 [@calvinmetcalf](http://github.com/calvinmetcalf)
 
+[@jfirebaugh](http://github.com/jfirebaugh)
+
 [@rsudekum](http://github.com/rsudekum)
 
 [@tmcw](http://github.com/tmcw)
