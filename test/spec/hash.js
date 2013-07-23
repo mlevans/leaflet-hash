@@ -53,4 +53,16 @@ describe("L.Hash", function() {
         map.setView([51.505, -0.09], 13);
         expect(location.hash).to.be('');
     });
+
+    it('parses a hash', function() {
+      var parsed = L.Hash.parseHash('#13/20/40');
+      expect(parsed.zoom).to.be(13);
+      expect(parsed.center).to.be.a(L.LatLng);
+      expect(parsed.center).to.eql({lat: 20, lng: 40});
+    });
+
+    it('formats a hash', function() {
+      map.setView([51, 2], 13);
+      expect(L.Hash.formatHash(map)).to.be('#13/51.0000/2.0000');
+    });
 });
