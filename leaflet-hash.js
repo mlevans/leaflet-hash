@@ -13,42 +13,45 @@
 		}
 	};
 
+	L.Hash.parseHash = function(hash) {
+		if(hash.indexOf('#') === 0) {
+			hash = hash.substr(1);
+		}
+		var args = hash.split("/");
+		if (args.length == 3) {
+			var zoom = parseInt(args[0], 10),
+			lat = parseFloat(args[1]),
+			lon = parseFloat(args[2]);
+			if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
+				return false;
+			} else {
+				return {
+					center: new L.LatLng(lat, lon),
+					zoom: zoom
+				};
+			}
+		} else {
+			return false;
+		}
+	};
+
+	L.Hash.formatHash = function(map) {
+		var center = map.getCenter(),
+		    zoom = map.getZoom(),
+		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+
+		return "#" + [zoom,
+			center.lat.toFixed(precision),
+			center.lng.toFixed(precision)
+		].join("/");
+	},
+
 	L.Hash.prototype = {
 		map: null,
 		lastHash: null,
 
-		parseHash: function(hash) {
-			if(hash.indexOf('#') === 0) {
-				hash = hash.substr(1);
-			}
-			var args = hash.split("/");
-			if (args.length == 3) {
-				var zoom = parseInt(args[0], 10),
-				lat = parseFloat(args[1]),
-				lon = parseFloat(args[2]);
-				if (isNaN(zoom) || isNaN(lat) || isNaN(lon)) {
-					return false;
-				} else {
-					return {
-						center: new L.LatLng(lat, lon),
-						zoom: zoom
-					};
-				}
-			} else {
-				return false;
-			}
-		},
-
-		formatHash: function(map) {
-			var center = map.getCenter(),
-			    zoom = map.getZoom(),
-			    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
-
-			return "#" + [zoom,
-				center.lat.toFixed(precision),
-				center.lng.toFixed(precision)
-			].join("/");
-		},
+		parseHash: L.Hash.parseHash,
+		formatHash: L.Hash.formatHash,
 
 		init: function(map) {
 			this.map = map;
