@@ -35,22 +35,23 @@
 		}
 	};
 
+	L.Hash.formatHash = function(map) {
+		var center = map.getCenter(),
+		    zoom = map.getZoom(),
+		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+
+		return "#" + [zoom,
+			center.lat.toFixed(precision),
+			center.lng.toFixed(precision)
+		].join("/");
+	},
+
 	L.Hash.prototype = {
 		map: null,
 		lastHash: null,
 
 		parseHash: L.Hash.parseHash,
-
-		formatHash: function(map) {
-			var center = map.getCenter(),
-			    zoom = map.getZoom(),
-			    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
-
-			return "#" + [zoom,
-				center.lat.toFixed(precision),
-				center.lng.toFixed(precision)
-			].join("/");
-		},
+		formatHash: L.Hash.formatHash,
 
 		init: function(map) {
 			this.map = map;
