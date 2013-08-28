@@ -12,6 +12,7 @@
       "mocha": "~1.8",
       "expect.js": "~0.2.0"
   },
+  "main": "leaflet-hash.js",
   "optionalDependencies": {},
   "engines": {
     "node": "*"
