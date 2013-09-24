@@ -2,7 +2,7 @@
   "author": "Michael Lawrence Evans",
   "name": "leaflet-hash",
   "description": "linkable location hashes for leaflet",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/mlevans/leaflet-hash",
   "repository": {
     "type": "git",
