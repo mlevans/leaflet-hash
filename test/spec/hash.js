@@ -49,7 +49,7 @@ describe("L.Hash", function() {
     it('unbinds events when removed', function() {
         location.hash = '';
         var hash = L.hash(map);
-        hash.remove();
+        map.removeControl(hash);
         map.setView([51.505, -0.09], 13);
         expect(location.hash).to.be('');
     });
