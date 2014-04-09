@@ -12,7 +12,7 @@
 			this.init(map);
 		}
 
-    this.events = new Object();
+		this.events = new Object();
 	};
 
 	L.Hash.parseHash = function(hash) {
@@ -88,11 +88,11 @@
 			}
 
 			var hash = this.formatHash(this.map);
-      if (this.events['change']) {
-        for (var i=0; i<this.events['change'].length; i++) {
-          hash = this.events['change'][i](hash);
-        }
-      }
+			if (this.events['change']) {
+				for (var i=0; i<this.events['change'].length; i++) {
+					hash = this.events['change'][i](hash);
+				}
+			}
 
 			if (this.lastHash != hash) {
 				location.replace(hash);
@@ -112,49 +112,49 @@
 
 				this.map.setView(parsed.center, parsed.zoom);
 
-        if (this.events['update']) {
-          for (var i=0; i<this.events['update'].length; i++) {
-            this.events['update'][i](hash);
-          }
-        }
+				if (this.events['update']) {
+					for (var i=0; i<this.events['update'].length; i++) {
+						this.events['update'][i](hash);
+					}
+				}
 				this.movingMap = false;
 			} else {
 				this.onMapMove(this.map);
 			}
 		},
 
-    on: function(event, func) {
-      if (! this.events[event]) {
-        this.events[event] = [ func ];
-      } else {
-        this.events[event].push(func);
-      }
-    },
-    off: function(event, func) {
-      if (this.events[event]) {
-        for (var i=0; i<this.events[event].length; i++) {
-          if (this.events[event][i] == func) {
-            this.events[event].splice(i);
-            return;
-          }
-        }
-      }
-    },
-    trigger: function(event) {
-      if (event == "move") {
-        if (! this.movingMap) {
-            this.onMapMove();
-        }
-      }
-    },
-    // setMovingMap()/clearMovingMap() when making multiple changes that affect hash arguments
-    //   ie when moving location and changing visible layers
-    setMovingMap: function() {
-      this.movingMap = true;
-    },
-    clearMovingMap: function() {
-      this.movingMap = false;
-    },
+		on: function(event, func) {
+			if (! this.events[event]) {
+				this.events[event] = [ func ];
+			} else {
+				this.events[event].push(func);
+			}
+		},
+		off: function(event, func) {
+			if (this.events[event]) {
+				for (var i=0; i<this.events[event].length; i++) {
+					if (this.events[event][i] == func) {
+						this.events[event].splice(i);
+						return;
+					}
+				}
+			}
+		},
+		trigger: function(event) {
+			if (event == "move") {
+				if (! this.movingMap) {
+					this.onMapMove();
+				}
+			}
+		},
+		// setMovingMap()/clearMovingMap() when making multiple changes that affect hash arguments
+		//   ie when moving location and changing visible layers
+		setMovingMap: function() {
+			this.movingMap = true;
+		},
+		clearMovingMap: function() {
+			this.movingMap = false;
+		},
 		// defer hash change updates every 100ms
 		changeDefer: 100,
 		changeTimeout: null,
