@@ -97,6 +97,11 @@
 			if (this.lastHash != hash) {
 				location.replace(hash);
 				this.lastHash = hash;
+				if (this.events['hash']) {
+					for (var i=0; i<this.events['hash'].length; i++) {
+						this.events['hash'][i](hash);
+					}
+				}
 			}
 		},
 
