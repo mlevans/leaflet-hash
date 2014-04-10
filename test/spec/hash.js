@@ -65,4 +65,88 @@ describe("L.Hash", function() {
       map.setView([51, 2], 13);
       expect(L.Hash.formatHash(map)).to.be('#13/51.0000/2.0000');
     });
+    
+    function setQueryVariable(hash, key, value) {
+      var vars = hash.split("&");
+      var found = false;
+      for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+        if(pair[0] == key){
+          vars[i] = key + "=" + value;
+          found = true;
+        }
+      }
+      if (! found) { vars.push(  key + "=" + value ); }
+      return(vars.join("&"));
+    }
+
+    function getQueryVariable(hash, variable) {
+      var vars = hash.split("&");
+      for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+        if(pair[0] == variable){return pair[1];}
+      }
+      return(false);
+    }
+
+    it('updates hash from layers', function() {
+      var hash = L.hash(map);
+      map.setView([51.505, -0.09], 13);
+       
+      var group = L.layerGroup();
+      group.addTo(map);
+
+      hash.on('change', function(hash) {
+        var ids = [];
+        group.eachLayer( function(layer) { ids.push(layer.getAttribution()); } );
+        return setQueryVariable(hash, "layers", ids.join(','));
+      });
+
+      var layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: 'OSM' });
+      group.addLayer( layer );
+      hash.trigger('move');
+
+      expect(location.hash).to.be('#13/51.5050/-0.0900&layers=OSM');
+
+      var hot_layer = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: 'HOT' });
+      group.addLayer( hot_layer );
+      hash.trigger('move');
+      expect(location.hash).to.be('#13/51.5050/-0.0900&layers=OSM,HOT');  
+   
+      group.removeLayer(layer);
+      group.removeLayer(hot_layer);
+      hash.trigger('move');  
+      expect(location.hash).to.be('#13/51.5050/-0.0900&layers=');     
+    });
+
+    it('updates layers from hash', function(done) {
+      var hash = L.hash(map);
+      map.setView([51.505, -0.09], 13);
+
+      var group = L.layerGroup();
+      group.addTo(map);
+
+      hash.on('update', function(hash) {
+        group.eachLayer( function(layer) { group.removeLayer( layer ); });
+        layers = getQueryVariable(hash, "layers");
+        if (layers == "OSM") {
+          var layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: 'OSM' });
+          group.addLayer( layer );
+        } else if (layers = "HOT") {
+          var layer = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: 'HOT' });
+          group.addLayer( layer );
+        }
+      });
+
+      location.hash = '#13/20/40&layers=HOT';
+      window.setTimeout(function() {
+        expect(Math.round(map.getCenter().lat)).to.be(20);
+        expect(Math.round(map.getCenter().lng)).to.be(40);
+        var ids = [];
+        group.eachLayer( function(layer) { ids.push(layer.getAttribution()); } );
+          expect(ids[0]).to.be("HOT");
+          expect(ids.length).to.be(1);
+          done();
+        }, 200);  
+    });
 });
