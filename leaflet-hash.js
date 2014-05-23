@@ -102,7 +102,7 @@
 			if (parsed) {
 				this.movingMap = true;
 
-				this.map.setView(parsed.center, parsed.zoom);
+				this.map.setView(parsed.center, parsed.zoom, { animate: false});
 
 				this.movingMap = false;
 			} else {
