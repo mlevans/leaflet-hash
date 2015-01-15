@@ -5,15 +5,16 @@
 			(doc_mode === undefined || doc_mode > 7);
 	})();
 
-	L.Hash = function(map) {
-		this.onHashChange = L.Util.bind(this.onHashChange, this);
+	google.maps.Hash = function(map) {
+		this.onHashChange = this.onHashChange.bind(this);
+		
 
 		if (map) {
 			this.init(map);
 		}
 	};
 
-	L.Hash.parseHash = function(hash) {
+	google.maps.Hash.parseHash = function(hash) {
 		if(hash.indexOf('#') === 0) {
 			hash = hash.substr(1);
 		}
@@ -26,7 +27,7 @@
 				return false;
 			} else {
 				return {
-					center: new L.LatLng(lat, lon),
+					center: new google.maps.LatLng(lat, lon),
 					zoom: zoom
 				};
 			}
@@ -35,23 +36,23 @@
 		}
 	};
 
-	L.Hash.formatHash = function(map) {
+	google.maps.Hash.formatHash = function(map) {
 		var center = map.getCenter(),
 		    zoom = map.getZoom(),
 		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
 
 		return "#" + [zoom,
-			center.lat.toFixed(precision),
-			center.lng.toFixed(precision)
+			center.lat().toFixed(precision),
+			center.lng().toFixed(precision)
 		].join("/");
 	},
 
-	L.Hash.prototype = {
+	google.maps.Hash.prototype = {
 		map: null,
 		lastHash: null,
 
-		parseHash: L.Hash.parseHash,
-		formatHash: L.Hash.formatHash,
+		parseHash: google.maps.Hash.parseHash,
+		formatHash: google.maps.Hash.formatHash,
 
 		init: function(map) {
 			this.map = map;
@@ -65,6 +66,13 @@
 			}
 		},
 
+		trigger: google.maps.event.trigger,
+		addListener: google.maps.event.addListener,
+		addListenerOnce: google.maps.event.addListenerOnce,
+		addListenerDom: google.maps.event.addDomListener,
+		addListenerDomOnce: google.maps.event.addDomListenerOnce,
+		removeListener: google.maps.event.removeListener,
+
 		removeFrom: function(map) {
 			if (this.changeTimeout) {
 				clearTimeout(this.changeTimeout);
@@ -77,11 +85,12 @@
 			this.map = null;
 		},
 
-		onMapMove: function() {
+		onMapMove: function(map) {
+			console.log(arguments, this);
 			// bail if we're moving the map (updating from a hash),
 			// or if the map is not yet loaded
 
-			if (this.movingMap || !this.map._loaded) {
+			if (this.movingMap) { // || !this.map._loaded) {
 				return false;
 			}
 
@@ -102,7 +111,9 @@
 			if (parsed) {
 				this.movingMap = true;
 
-				this.map.setView(parsed.center, parsed.zoom);
+				this.map.setCenter(parsed.center)
+				this.map.setZoom(parsed.zoom)
+				// this.map.setView(parsed.center, parsed.zoom);
 
 				this.movingMap = false;
 			} else {
@@ -128,10 +139,11 @@
 		isListening: false,
 		hashChangeInterval: null,
 		startListening: function() {
-			this.map.on("moveend", this.onMapMove, this);
+			this.mapMoveListener = this.addListener(this.map, "bounds_changed", this.onMapMove.bind(this), this)
+
 
 			if (HAS_HASHCHANGE) {
-				L.DomEvent.addListener(window, "hashchange", this.onHashChange);
+				this.addListenerDom(window, "hashchange", this.onHashChange);
 			} else {
 				clearInterval(this.hashChangeInterval);
 				this.hashChangeInterval = setInterval(this.onHashChange, 50);
@@ -140,23 +152,25 @@
 		},
 
 		stopListening: function() {
-			this.map.off("moveend", this.onMapMove, this);
+			this.removeListener(this.map, "moveend", this.onMapMove, this);
+			this.removeListener(this.map, "moveend", this.mapMoveListener);
+
 
 			if (HAS_HASHCHANGE) {
-				L.DomEvent.removeListener(window, "hashchange", this.onHashChange);
+				google.maps.removeListener(window, "hashchange", this.onHashChange);
 			} else {
 				clearInterval(this.hashChangeInterval);
 			}
 			this.isListening = false;
 		}
 	};
-	L.hash = function(map) {
-		return new L.Hash(map);
+	google.maps.hash = function(map) {
+		return new google.maps.Hash(map);
 	};
-	L.Map.prototype.addHash = function() {
-		this._hash = L.hash(this);
+	google.maps.Map.prototype.addHash = function() {
+		this._hash = google.maps.hash(this);
 	};
-	L.Map.prototype.removeHash = function() {
+	google.maps.Map.prototype.removeHash = function() {
 		this._hash.removeFrom();
 	};
 })(window);
