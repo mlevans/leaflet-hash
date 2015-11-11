@@ -60,9 +60,7 @@
 			this.lastHash = null;
 			this.onHashChange();
 
-			if (!this.isListening) {
-				this.startListening();
-			}
+			this.startListening();
 		},
 
 		removeFrom: function(map) {
@@ -70,9 +68,7 @@
 				clearTimeout(this.changeTimeout);
 			}
 
-			if (this.isListening) {
-				this.stopListening();
-			}
+			this.stopListening();
 
 			this.map = null;
 		},
@@ -128,6 +124,7 @@
 		isListening: false,
 		hashChangeInterval: null,
 		startListening: function() {
+			if (this.isListening) { return; }
 			this.map.on("moveend", this.onMapMove, this);
 
 			if (HAS_HASHCHANGE) {
@@ -140,6 +137,7 @@
 		},
 
 		stopListening: function() {
+			if (!this.isListening) { return; }
 			this.map.off("moveend", this.onMapMove, this);
 
 			if (HAS_HASHCHANGE) {
