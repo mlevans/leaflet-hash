@@ -21,6 +21,26 @@ You can view a demo of leaflet-hash at [mlevans.github.io/leaflet-hash/map.html]
         var hash = new L.Hash(map);
     ```
 
+### Modifications from original
+`L.Hash` accepts a second parameter `options` which can have two values, `baseURI` and `query`. `baseURI` allows `leaflet-hash` to be used
+along side any hash-based router, such as `angular-router` and `react-router`. For example, if your map lives at `http://mydomain.com/#/map`, you can configure `leaflet-hash` to respect that format as so:
+
+````
+L.Hash(map, {
+	baseURI: '#/map'
+});
+````
+
+`query` can be used to allow `leaflet-hash` to respect query strings that may be present, for example, if you would like to use the URI
+to manage/preserve map layers. If you would like to have URIs like '#/0/1/1?layers=OSM,Mapbox', you can enable it as so
+
+````
+L.Hash(map, {
+	query: true
+});
+````
+
+
 ### Author
 [@mlevans](http://github.com/mlevans)
 
