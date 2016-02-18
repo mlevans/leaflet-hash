@@ -16,10 +16,10 @@
 	};
 
 	L.Hash.parseHash = function(hash) {
-		if (this.options.baseURI) {
+		if (this.options && this.options.baseURI) {
 			hash = hash.replace(this.options.baseURI, "");
 		}
-		if (this.options.query) {
+		if (this.options && this.options.query) {
 			hash = hash.split('?')[0];
 		}
 		if (hash.indexOf('#') === 0) {
@@ -48,9 +48,9 @@
 		    zoom = map.getZoom(),
 		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
 
-		var query = (this.options.query && location.hash.indexOf('?') > -1 ? '?' + location.hash.split('?')[1] : '');
+		var query = (this.options && this.options.query && location.hash.indexOf('?') > -1 ? '?' + location.hash.split('?')[1] : '');
 
-		return (this.options.baseURI ? this.options.baseURI : "") +
+		return (this.options && this.options.baseURI ? this.options.baseURI : "") +
 		  "#" + [zoom,
 			center.lat.toFixed(precision),
 			center.lng.toFixed(precision)
@@ -161,8 +161,8 @@
 			this.isListening = false;
 		}
 	};
-	L.hash = function(map) {
-		return new L.Hash(map);
+	L.hash = function(map, options) {
+		return new L.Hash(map, options);
 	};
 	L.Map.prototype.addHash = function() {
 		this._hash = L.hash(this);
