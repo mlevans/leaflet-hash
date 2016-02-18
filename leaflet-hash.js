@@ -5,8 +5,10 @@
 			(doc_mode === undefined || doc_mode > 7);
 	})();
 
-	L.Hash = function(map) {
+	L.Hash = function(map, options) {
 		this.onHashChange = L.Util.bind(this.onHashChange, this);
+
+		this.options = options || {};
 
 		if (map) {
 			this.init(map);
@@ -14,7 +16,13 @@
 	};
 
 	L.Hash.parseHash = function(hash) {
-		if(hash.indexOf('#') === 0) {
+		if (this.options && this.options.baseURI) {
+			hash = hash.replace(this.options.baseURI, "");
+		}
+		if (this.options && this.options.query) {
+			hash = hash.split('?')[0];
+		}
+		if (hash.indexOf('#') === 0) {
 			hash = hash.substr(1);
 		}
 		var args = hash.split("/");
@@ -40,10 +48,13 @@
 		    zoom = map.getZoom(),
 		    precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
 
-		return "#" + [zoom,
+		var query = (this.options && this.options.query && location.hash.indexOf('?') > -1 ? '?' + location.hash.split('?')[1] : '');
+
+		return (this.options && this.options.baseURI ? this.options.baseURI : "") +
+		  "#" + [zoom,
 			center.lat.toFixed(precision),
 			center.lng.toFixed(precision)
-		].join("/");
+		].join("/") + query;
 	},
 
 	L.Hash.prototype = {
@@ -150,8 +161,8 @@
 			this.isListening = false;
 		}
 	};
-	L.hash = function(map) {
-		return new L.Hash(map);
+	L.hash = function(map, options) {
+		return new L.Hash(map, options);
 	};
 	L.Map.prototype.addHash = function() {
 		this._hash = L.hash(this);

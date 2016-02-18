@@ -65,4 +65,18 @@ describe("L.Hash", function() {
       map.setView([51, 2], 13);
       expect(L.Hash.formatHash(map)).to.be('#13/51.0000/2.0000');
     });
+
+    it('respects a baseURI', function() {
+      location.hash = '#/map';
+      var hash = L.hash(map, {baseURI: '#/map'});
+      map.setView([51, 2], 13);
+      expect(location.hash).to.eql('#/map#13/51.0000/2.0000');
+    });
+
+    it('respects a query', function() {
+      location.hash = location.hash + '?foo=bar';
+      var hash = L.hash(map, {query: true});
+      map.setView([51, 2], 13);
+      expect(location.hash).to.eql('#13/51.0000/2.0000?foo=bar');
+    });
 });
