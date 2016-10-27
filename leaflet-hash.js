@@ -87,7 +87,7 @@
 
 			var hash = this.formatHash(this.map);
 			if (this.lastHash != hash) {
-				location.replace(hash);
+				location.hash = hash;
 				this.lastHash = hash;
 			}
 		},
