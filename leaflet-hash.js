@@ -103,7 +103,8 @@
 				this.movingMap = true;
 
 				this.map.setView(parsed.center, parsed.zoom);
-
+				this.lastHash = hash;
+				
 				this.movingMap = false;
 			} else {
 				this.onMapMove(this.map);
